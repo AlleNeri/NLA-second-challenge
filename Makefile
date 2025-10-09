@@ -3,7 +3,7 @@ BUILD_DIR := build
 
 .PHONY: run
 run: $(BUILD_DIR)/main
-	./$(BUILD_DIR)/main uma.jpg
+	./$(BUILD_DIR)/main
 
 $(BUILD_DIR)/main: main.cpp
 	mkdir -p $(BUILD_DIR)
