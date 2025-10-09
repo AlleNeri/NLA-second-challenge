@@ -26,16 +26,19 @@ bool isPositiveDefinite(const VectorXcd& eigval){
     }
     return result;
 }
-
-int findPos(const VectorXcd& eigval, double tofind){
+ 
+int findSecondSmallest(const VectorXcd& eigval){
+    double lower = eigval.real()(0);
+    int index=0;
     for(int i=0; i<eigval.size(); ++i){
-        if(eigval(i) == tofind){
-            return i;
+        if(lower>eigval.real()(i) && eigval.real()(i)!=eigval.real().minCoeff()){
+            lower = eigval.real()(i);
+            index = i;
         }
     }
-    cout << "not found" << endl;
-    return -1;
+    return index;
 }
+
 
 int main(int argc, char* argv[]) {
     cout << "------------Task 1------------" << endl; 
@@ -83,8 +86,7 @@ cout << "------------Task 3------------" << endl;
 cout << "min eigenvalue: " << es.eigenvalues().real().minCoeff() << endl;
 cout << "max eigenvalue: " << es.eigenvalues().real().maxCoeff() << endl;
 cout << "------------Task 4------------" << endl;
-VectorXd eigval_sorted = es.eigenvalues().real();
-sort(eigval_sorted.data(), eigval_sorted.data()+eigval_sorted.size());
-cout << "smallest non 0 eigen value: " << eigval_sorted(1) << endl;
-cout << "corresponding eigen vector: " << es.eigenvectors().col(findPos(es.eigenvalues().real(), eigval_sorted(1))) << endl;
+int pos = findSecondSmallest(es.eigenvalues());
+cout << "smallest non 0 eigen value: " << es.eigenvalues()(pos) << endl;
+cout << "corresponding eigen vector: \n" << es.eigenvectors().col(pos) << endl;
 }
