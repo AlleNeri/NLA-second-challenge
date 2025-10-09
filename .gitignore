@@ -1,0 +1,14 @@
+# IDEE config files
+.vim/
+
+# png and jpg files
+*.png
+
+# mtx files
+*.mtx
+
+# txt files
+*.txt
+
+# build directory
+build/
