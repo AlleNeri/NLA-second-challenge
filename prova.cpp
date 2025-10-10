@@ -57,9 +57,7 @@ int main(int argc, char* argv[]) {
     VectorXd vg(9);
     for(int i=0;i<9;++i){
         vg(i)=0;
-        for(int j=0;j<9;++j){
-            vg(i) = vg(i) + Ag(i,j);
-        }
+        vg(i) = Ag.row(i).sum();
     }
     MatrixXd Lg(9,9);
     MatrixXd Dg(9,9);
@@ -72,21 +70,46 @@ int main(int argc, char* argv[]) {
     cout << "y: " << y << endl;
 
     EigenSolver<Eigen::MatrixXd> es(Lg);
-std::cout << "The eigenvalues of A are:\n" << es.eigenvalues() << "\n\n";
+    std::cout << "The eigenvalues of A are:\n" << es.eigenvalues() << "\n\n";
 
     // Eigenvectors are returned as a matrix of complex numbers, 
     // where each column is an eigenvector.
-std::cout << "The eigenvectors of A are:\n" << es.eigenvectors() << "\n\n";
+    std::cout << "The eigenvectors of A are:\n" << es.eigenvectors() << "\n\n";
 
-if(isSymmetric(Lg) && isPositiveDefinite(es.eigenvalues())){
-    cout << "symmetric positive definite" << endl;
-}
+    if(isSymmetric(Lg) && isPositiveDefinite(es.eigenvalues())){
+        cout << "symmetric positive definite" << endl;
+    }
 
-cout << "------------Task 3------------" << endl; 
-cout << "min eigenvalue: " << es.eigenvalues().real().minCoeff() << endl;
-cout << "max eigenvalue: " << es.eigenvalues().real().maxCoeff() << endl;
-cout << "------------Task 4------------" << endl;
-int pos = findSecondSmallest(es.eigenvalues());
-cout << "smallest non 0 eigen value: " << es.eigenvalues()(pos) << endl;
-cout << "corresponding eigen vector: \n" << es.eigenvectors().col(pos) << endl;
+    cout << "------------Task 3------------" << endl; 
+    cout << "min eigenvalue: " << es.eigenvalues().real().minCoeff() << endl;
+    cout << "max eigenvalue: " << es.eigenvalues().real().maxCoeff() << endl;
+    cout << "------------Task 4------------" << endl;
+    int pos = findSecondSmallest(es.eigenvalues());
+    cout << "smallest non 0 eigen value: " << es.eigenvalues()(pos) << endl;
+    cout << "corresponding eigen vector: \n" << es.eigenvectors().col(pos) << endl;
+    cout << "------------Task 5------------" << endl;
+    SparseMatrix<double, RowMajor> As;
+    loadMarket(As, "social.mtx");
+    cout << "frobenius_norm: " << As.norm() << endl;
+    cout << "------------Task 6------------" << endl;
+    VectorXd vs(351);
+    SparseMatrix<double, RowMajor> Ds(351,351);
+    for(int i=0;i<351;++i){
+        vs(i)=0;
+        vs(i) = As.row(i).sum();
+        if(vs(i) != 0){
+            Ds.coeffRef(i,i) = vs(i);
+        }
+    }
+    SparseMatrix<double, RowMajor> Ls(351,351);
+    Ls = Ds - As;
+    cout << "Ls is symmetric? " << isSymmetric(Ls) << endl;
+    cout << "Non-zero entries: " << Ls.nonZeros() << endl;
+    cout << "------------Task 7------------" << endl;
+    Ls.coeffRef(1,1) = Ls.coeff(1,1)+0.2;
+    saveMarket(Ls, "Ls.mtx");
+    cout << "using: mpirun -n 4 ./eigen1 testmat0.mtx eigvec.txt hist.txt -e pi -tol 10e-8" << endl;
+    cout << "max eigenvalue: 7.837972e+00, iterations: 960" << endl;
+    cout << "------------Task 8------------" << endl;
+
 }
