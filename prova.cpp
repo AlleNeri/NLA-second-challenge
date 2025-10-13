@@ -15,17 +15,6 @@ bool isSymmetric(const MatrixXd& mat) {
   }
   return mat.isApprox(mat.transpose());	// Check if the matrix is approximately equal to its transpose, considering numerical precision
 }
-
-//TO CHECK IF POSITIVE DEFINITE DEFINITION IS RIGHT
-bool isPositiveDefinite(const VectorXcd& eigval){
-    bool result = true;
-    for(int i=0; i<eigval.size() && result == true; ++i){
-        if(eigval(i).real() < 0 || eigval(i).imag() != 0){
-            result = false;
-        }
-    }
-    return result;
-}
  
 int findSecondSmallest(const VectorXcd& eigval){
     double lower = eigval.real()(0);
@@ -75,10 +64,7 @@ int main(int argc, char* argv[]) {
     // Eigenvectors are returned as a matrix of complex numbers, 
     // where each column is an eigenvector.
     std::cout << "The eigenvectors of A are:\n" << es.eigenvectors() << "\n\n";
-
-    if(isSymmetric(Lg) && isPositiveDefinite(es.eigenvalues())){
-        cout << "symmetric positive definite" << endl;
-    }
+    cout << "x^t*Lg*x=0 (with x=[1, ..., 1]^t) so Lg is not positive definite (but it is symmetric)" << endl;
 
     cout << "------------Task 3------------" << endl; 
     cout << "min eigenvalue: " << es.eigenvalues().real().minCoeff() << endl;
