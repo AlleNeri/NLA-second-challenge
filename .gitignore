@@ -6,6 +6,8 @@
 
 # mtx files
 *.mtx
+# except for the input file
+!social.mtx
 
 # txt files
 *.txt

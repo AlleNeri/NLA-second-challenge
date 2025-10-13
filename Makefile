@@ -3,7 +3,7 @@ BUILD_DIR := build
 
 .PHONY: run
 run: $(BUILD_DIR)/main
-	./$(BUILD_DIR)/main
+	./$(BUILD_DIR)/main social.mtx
 
 $(BUILD_DIR)/main: main.cpp
 	mkdir -p $(BUILD_DIR)
@@ -12,6 +12,6 @@ $(BUILD_DIR)/main: main.cpp
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)
-	rm -f uma_*.png *.mtx *.txt
+	rm -f *.mtx *.txt
 .PHONY: clear
 clear: clean
