@@ -84,6 +84,36 @@ SparseMatrix<int> computePermutationMatrix(const VectorXd &v) {
 	return P;
 }
 
+/** Return the submatrix of a given matrix
+ * @tparam T Type of the matrix elements (e.g., double, int)
+ * @param mat The input sparse matrix
+ * @param row_start The starting row index (inclusive)
+ * @param row_end The ending row index (exclusive)
+ * @param col_start The starting column index (inclusive)
+ * @param col_end The ending column index (exclusive)
+ * @return The extracted submatrix
+ */
+template<typename T>
+SparseMatrix<T> getSubmatrix(const SparseMatrix<T> &mat, int row_start, int row_end, int col_start, int col_end) {
+	// check bounds
+	if(row_start < 0 || row_end > mat.rows() || row_start >= row_end ||
+		col_start < 0 || col_end > mat.cols() || col_start >= col_end)
+		throw out_of_range("Submatrix indices are out of bounds.");
+
+	// Construct the submatrix
+	SparseMatrix<T> submat(row_end - row_start, col_end - col_start);
+	for(int k=0; k<mat.outerSize(); ++k)
+		for(typename SparseMatrix<T>::InnerIterator it(mat, k); it; ++it) {
+			int row = it.row();
+			int col = it.col();
+			if(row >= row_start && row < row_end &&
+				col >= col_start && col < col_end)
+				submat.insert(row - row_start, col - col_start) = it.value();
+		}
+
+	return submat;
+}
+
 int main(int argc, char* argv[]) {
 	if (argc < 2) {
 		cerr << "Usage: " << argv[0] << " <image_path>" << endl;
@@ -235,6 +265,7 @@ int main(int argc, char* argv[]) {
 	eigenvector = loadVectorFromMtx(filename_eigenvec);
 	if(eigenvector.size() != Ls.rows())
 		cerr << "Error: The size of the eigenvector (" << eigenvector.size() << ") does not match the size of the matrix Ls (" << Ls.rows() << "x" << Ls.cols() << ")." << endl;
+	cout << endl;
 
 	// Order the eigenvector entries
 	SparseMatrix<int> P = computePermutationMatrix(eigenvector);
@@ -248,6 +279,24 @@ int main(int argc, char* argv[]) {
 	int n_p = eigenvector.size() - n_n;
 	cout << "Number of positive entries in the eigenvector (n_p): " << n_p << endl;
 	cout << "Number of negative entries in the eigenvector (n_n): " << n_n << endl;
+
+	cout << endl << "--- Task 11 ---" << endl;
+
+	// Compute the reordered adjacency matrix Aord = P * As * P^T
+	SparseMatrix<int> Aord = P * As * P.transpose();
+
+	// Report the number of non-zero entries in the block Aord[0:n_p-1, n_p:n_p+n_n-1]
+	int row_start = 0,	// inclusive
+		row_end = n_p,	// exclusive
+		col_start = n_p,  // inclusive
+		col_end = n_p + n_n;  // exclusive
+
+	SparseMatrix<int> Aord_submatrix = getSubmatrix(Aord, row_start, row_end, col_start, col_end);
+	cout << "Number of non-zero entries in the block Aord[" << row_start << ":" << row_end-1 << ", " << col_start << ":" << col_end-1 << "]: " << Aord_submatrix.nonZeros() << endl;
+
+	// Report the number of non-zero entries in the block As[0:n_p-1, n_p:n_p+n_n-1]
+	SparseMatrix<int> As_submatrix = getSubmatrix(As, row_start, row_end, col_start, col_end);
+	cout << "Number of non-zero entries in the block As[" << row_start << ":" << row_end-1 << ", " << col_start << ":" << col_end-1 << "]: " << As_submatrix.nonZeros() << endl;
 
 	return 0;
 }
