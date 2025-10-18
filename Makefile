@@ -12,6 +12,8 @@ $(BUILD_DIR)/main: main.cpp
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)
-	rm -f *.mtx *.txt
+	rm -f *.txt
+	# remove also all the .mtx files except social.mtx
+	find . -maxdepth 1 -type f -name '*.mtx' ! -name 'social.mtx' -delete
 .PHONY: clear
 clear: clean
