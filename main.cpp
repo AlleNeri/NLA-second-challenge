@@ -70,7 +70,7 @@ SparseMatrix<int> computePermutationMatrix(const VectorXd &v) {
 
 	// Sort the indices based on the values in v
 	sort(indices.begin(), indices.end(), [&v](int a, int b) {
-		return v(a) < v(b);
+		return v(a) > v(b);
 	});
 
 	// Create the permutation matrix P according to the indices sorting found
